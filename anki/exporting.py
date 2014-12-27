@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright: Damien Elmes <anki@ichi2.net>
+# Copyright: Damien Elmes <anki@ichi2.net>, Jose Diez <me@jdiez.me>
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
 import   re, os, zipfile, shutil
@@ -214,7 +214,7 @@ class AnkiExporter(Exporter):
         # overwrite to apply customizations to the deck before it's closed,
         # such as update the deck description
         pass
-    
+
     def removeSystemTags(self, tags):
         return self.src.tags.remFromStr("marked leech", tags)
 
@@ -295,10 +295,13 @@ class AnkiPackageExporter(AnkiExporter):
 def exporters():
     def id(obj):
         return ("%s (*%s)" % (obj.key, obj.ext), obj)
+
     exps = [
-        id(AnkiPackageExporter),
-        id(TextNoteExporter),
-        id(TextCardExporter),
+        AnkiPackageExporter,
+        TextNoteExporter,
+        TextCardExporter,
     ]
+    exps = map(id, exps)
+
     runHook("exportersList", exps)
     return exps
