@@ -8,6 +8,8 @@ from anki.utils import  ids2str, splitFields, json
 from anki.hooks import runHook
 from anki import Collection
 
+from aqt.webview import stdHtml
+
 class Exporter(object):
     def __init__(self, col, did=None):
         self.col = col
@@ -289,6 +291,22 @@ class AnkiPackageExporter(AnkiExporter):
         # is zipped up
         pass
 
+class HTMLPackageExporter(Exporter):
+    key = _("HTML Package")
+    ext = ".html"
+    includeID = False
+    includeTags = True
+
+    def doExport(self, file):
+        out = ""
+        for r in self.col.renderQA(ids):
+            card = self.col.getCard(r['id'])
+            css = card.css().replace("<style>", "").replace("</style>", "")
+
+            out += stdHtml(r['a'], css) + "\n\n\n ------ \n\n\n"
+
+        file.write(out.encode("utf-8"))
+
 # Export modules
 ##########################################################################
 
@@ -300,6 +318,7 @@ def exporters():
         AnkiPackageExporter,
         TextNoteExporter,
         TextCardExporter,
+        HTMLPackageExporter
     ]
     exps = map(id, exps)
 

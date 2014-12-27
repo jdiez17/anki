@@ -107,26 +107,6 @@ class AnkiWebView(QWebView):
         self._loadFinishedCB = loadCB
         QWebView.setHtml(self, html)
 
-    def stdHtml(self, body, css="", bodyClass="", loadCB=None, js=None, head=""):
-        if isMac:
-            button = "font-weight: bold; height: 24px;"
-        else:
-            button = "font-weight: normal;"
-        self.setHtml("""
-<!doctype html>
-<html><head><style>
-button {
-%s
-}
-%s</style>
-<script>%s</script>
-%s
-
-</head>
-<body class="%s">%s</body></html>""" % (
-    button, css, js or anki.js.jquery+anki.js.browserSel,
-    head, bodyClass, body), loadCB)
-
     def setBridge(self, bridge):
         self._bridge.setBridge(bridge)
 
@@ -156,3 +136,31 @@ button {
         if self._loadFinishedCB:
             self._loadFinishedCB(self)
             self._loadFinishedCB = None
+
+    def stdHtml(self, *args, **kwargs):
+        loadCB = None
+        if 'loadCB' in kwargs:
+            loadCB = kwargs['loadCB']
+
+        self.setHtml(stdHtml(*args, **kwargs), loadCB)
+
+# TODO: Move elsewhere
+def stdHtml(body, css="", bodyClass="", loadCB=None, js=None, head=""):
+    if isMac:
+        button = "font-weight: bold; height: 24px;"
+    else:
+        button = "font-weight: normal;"
+    return """
+<!doctype html>
+<html><head><style>
+button {
+%s
+}
+%s</style>
+<script>%s</script>
+%s
+
+</head>
+<body class="%s">%s</body></html>""" % (
+button, css, js or anki.js.jquery+anki.js.browserSel,
+head, bodyClass, body)
